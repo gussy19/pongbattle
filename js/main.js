@@ -38,10 +38,12 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const firstPlayerRef = ref(db, "pongfirst");
-    const secondPlayerRef = ref(db, "pongsecond");
-    const ballxRef = ref(db, "ballx");
-    const ballyRef = ref(db, "bally");
+    const firstPlayerRef = ref(db, "pongfirstpaddle");
+    const secondPlayerRef = ref(db, "pongsecondpaddle");
+    const ballxRef = ref(db, "pongballx");
+    const ballyRef = ref(db, "pongbally");
+    const firstPlayerScoreRef = ref(db, "pongfirstscore");
+    const secondPlayerScoreRef = ref(db, "pongsecondscore");
 
 // 即時関数
 (() => {
@@ -398,10 +400,18 @@
     // スコア追加のメソッド
     addScoreOne() {
       this.scoreone++;
+      // スコアはplayer1に合わせるので、スコア登録
+      if (username == "player1"){
+        set(firstPlayerScoreRef, this.scoreone);
+      }
     }
 
     addScoreTwo() {
       this.scoretwo++;
+        // スコアはplayer1に合わせるので、スコア登録
+      if (username == "player1"){
+        set(secondPlayerScoreRef, this.scoretwo);
+      }
     }
 
     // ゲームループ
@@ -460,6 +470,27 @@
 
     // スコア設定
     drawScore() {
+      // Player2の場合は、firebaseのscoreを表示
+      if (username == "player2"){
+        get(firstPlayerScoreRef).then((snapshot) => {
+          if (snapshot.val()) {
+              this.scoreone = snapshot.val();
+          } else {
+              console.log("No data available");
+          }
+          }).catch((error) => {
+          console.error(error);
+        });
+        get(secondPlayerScoreRef).then((snapshot) => {
+          if (snapshot.val()) {
+              this.scoretwo = snapshot.val();
+          } else {
+              console.log("No data available");
+          }
+          }).catch((error) => {
+          console.error(error);
+        });
+      }
       this.ctx.font = '20px Arial';
       this.ctx.fillStyle = '#fdfdfd';
       this.ctx.fillText("Player1: " + this.scoreone, 30, 350);
