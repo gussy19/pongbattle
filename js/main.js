@@ -1,4 +1,23 @@
 'use strict';
+    // ログイン情報から名前を取得
+    const storage = localStorage;
+    let username;
+    if(!storage.getItem("yourname")){
+        let h = '<p>';
+            h += "ゲームに参加するにはログインが必要です";
+            h += '</p>';
+        $("#user").append( h );
+    }
+    else{
+        username = storage.getItem("yourname");
+        console.log(username);
+        let h = '<p>';
+            h += "名前: ";
+            h += username;
+            h += '</p>';
+        $("#user").append( h );
+    }
+
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
     import { getDatabase, ref, get, push, set, onChildAdded, remove, onChildRemoved } 
@@ -19,7 +38,8 @@
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dbRef = ref(db, "pongapp");
+    const firstPlayerRef = ref(db, "pongfirst");
+    const secondPlayerRef = ref(db, "pongsecond");
 
 // 即時関数
 (() => {
@@ -114,7 +134,7 @@
     }
   }
 
-  // Paddle1 クラス(プレイヤー1)
+  // Paddle1 クラス(プレイヤー1手前側)
   class Paddle1 {
     constructor(canvas, game) {
       this.canvas = canvas;
@@ -136,9 +156,23 @@
 
     // マウスの動きをmousemoveで取得。clientXでx軸を取得して追加
     addHandler() {
-      document.addEventListener('mousemove', e => {
-        this.mouseX = e.clientX;
+      if (username == "player1"){
+        document.addEventListener('mousemove', e => {
+          this.mouseX = e.clientX;
+        });
+      }
+      else {
+        get(firstPlayerRef).then((snapshot) => {
+          if (snapshot.val()) {
+              console.log(snapshot.val());
+              this.mouseX = snapshot.val();
+          } else {
+              console.log("No bot message available");
+          }
+          }).catch((error) => {
+          console.error(error);
       });
+      }
     }
 
     // ボールの位置情報のアップデート。引数はballクラス
@@ -185,7 +219,7 @@
       }
 
         // Firebaseへのデータsetのテスト
-        set(dbRef, this.x);
+        set(firstPlayerRef, this.x);
     }
 
     // paddleをcanvas内に描画
@@ -266,6 +300,9 @@
       if (this.x + this.w > this.canvas.width) {
         this.x = this.canvas.width - this.w;
       }
+
+        // Firebaseへのデータsetのテスト
+        set(secondPlayerRef, this.x);
     }
 
     // paddleをcanvas内に描画

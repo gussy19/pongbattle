@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log in</title>
+</head>
+<body>
+  <p>プレイヤーを選んでください。</p>
+  <button onclick="submitName1()">Player1</button>
+  <button onclick="submitName2()">Player2</button>
+  <a href="./index.html">戻る</a>
+  <script>
+    const storage = localStorage;
+    function submitName1(){
+      storage.setItem('yourname', 'player1');
+      location.href='./index.html';
+    };
+    function submitName2(){
+      storage.setItem('yourname', 'player2');
+      location.href='./index.html';
+    };
+  </script>
+</body>
+</html>
