@@ -454,7 +454,8 @@
     drawScore() {
       this.ctx.font = '20px Arial';
       this.ctx.fillStyle = '#fdfdfd';
-      this.ctx.fillText(this.score, 10, 25);
+      this.ctx.fillText("Player1: " + this.score, 30, 350);
+      this.ctx.fillText("Player2: " + this.score, 280, 60);
     }
   }
   
