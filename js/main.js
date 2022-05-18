@@ -40,6 +40,8 @@
     const db = getDatabase(app);
     const firstPlayerRef = ref(db, "pongfirst");
     const secondPlayerRef = ref(db, "pongsecond");
+    const ballxRef = ref(db, "ballx");
+    const ballyRef = ref(db, "bally");
 
 // 即時関数
 (() => {
@@ -124,9 +126,39 @@
         this.vy *= -1;
         // this.isMissed = true;
       }
+
+      // ボールの場所をはplayer1に合わせる。firebaseに設定
+      if (username == "player1") {
+        set(ballxRef, this.x);
+        set(ballyRef, this.y);
+      }
     }
 
     draw() {
+      // ボールのx座標を取得
+      if (username == "player2") {
+        get(ballxRef).then((snapshot) => {
+          if (snapshot.val()) {
+              // console.log(snapshot.val());
+              this.x = snapshot.val();
+          } else {
+              console.log("No bot message available");
+          }
+          }).catch((error) => {
+          console.error(error);
+        });
+        //ボールのy座標を取得
+        get(ballyRef).then((snapshot) => {
+          if (snapshot.val()) {
+              // console.log(snapshot.val());
+              this.y = snapshot.val();
+          } else {
+              console.log("No bot message available");
+          }
+          }).catch((error) => {
+          console.error(error);
+        });
+      }
       this.ctx.beginPath();
       this.ctx.fillStyle = '#fdfdfd';
       // arcで円を描画 Math.PIは円周率
@@ -194,9 +226,6 @@
         this.game.addScore();
       }
       
-
-
-
       //プレイヤー1でない場合は、x軸はfirebaseから送信される値で決まる。
       if (username != "player1"){
         get(firstPlayerRef).then((snapshot) => {
@@ -206,7 +235,7 @@
               this.mouseX += rect.left
               this.mouseX += this.w / 2
           } else {
-              console.log("No bot message available");
+              // console.log("No bot message available");
           }
           }).catch((error) => {
           console.error(error);
@@ -318,12 +347,12 @@
       if (username != "player2"){
         get(secondPlayerRef).then((snapshot) => {
           if (snapshot.val()) {
-              console.log(snapshot.val());
+              // console.log(snapshot.val());
               this.mouseX = snapshot.val();
               this.mouseX += rect.left
               this.mouseX += this.w / 2
           } else {
-              console.log("No bot message available");
+              // console.log("No bot message available");
           }
           }).catch((error) => {
           console.error(error);
