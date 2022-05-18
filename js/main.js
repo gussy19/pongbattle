@@ -52,8 +52,9 @@
   
   //Ballクラス
   class Ball {
-    constructor(canvas) {
+    constructor(canvas, game) {
       this.canvas = canvas;
+      this.game = game;
       this.ctx = this.canvas.getContext('2d');
       // ボールのx座標をランダム生成
       this.x = rand(30, 250);
@@ -109,6 +110,7 @@
       if (this.y - this.r > this.canvas.height) {
         // this.isMissed = true;
         this.vy *= -1;
+        this.game.addScoreTwo();
       }
 
       // 左か右に行ってしまった場合は、ベクトルxに-1をかけて跳ね返す
@@ -124,6 +126,7 @@
         this.y - this.r < 0
       ) {
         this.vy *= -1;
+        this.game.addScoreOne();
         // this.isMissed = true;
       }
 
@@ -223,7 +226,7 @@
         // 上記のパドルの条件が揃えば、ボールの跳躍とボールの方向を指定。ゲームのスコアも追加。
         ball.bounce();
         ball.repositionTop(paddleTop);
-        this.game.addScore();
+        // this.game.addScore();
       }
       
       //プレイヤー1でない場合は、x軸はfirebaseから送信される値で決まる。
@@ -326,7 +329,7 @@
         ball.bounce();
         // paddleBottomにreposition
         ball.repositionBottom(paddleBottom);
-        this.game.addScore();
+        // this.game.addScore();
       }
       
       // キャンバスの相対的な位置をrectに追加。
@@ -379,7 +382,7 @@
       // キャンバスのコンテキスト設定
       this.ctx = this.canvas.getContext('2d');
       // ボールクラスの読み込み
-      this.ball = new Ball(this.canvas);
+      this.ball = new Ball(this.canvas, this);
       // Paddleクラスの読み込み キャンバスとゲームクラスが引数
       this.paddle1 = new Paddle1(this.canvas, this);
       this.paddle2 = new Paddle2(this.canvas, this);
@@ -388,12 +391,17 @@
       // ゲームオーバーフラグの初期値をfalseに設定
       this.isGameOver = false;
       // 最初はスコアゼロ
-      this.score = 0;
+      this.scoreone = 0;
+      this.scoretwo = 0;
     }
 
     // スコア追加のメソッド
-    addScore() {
-      this.score++;
+    addScoreOne() {
+      this.scoreone++;
+    }
+
+    addScoreTwo() {
+      this.scoretwo++;
     }
 
     // ゲームループ
@@ -454,8 +462,8 @@
     drawScore() {
       this.ctx.font = '20px Arial';
       this.ctx.fillStyle = '#fdfdfd';
-      this.ctx.fillText("Player1: " + this.score, 30, 350);
-      this.ctx.fillText("Player2: " + this.score, 280, 60);
+      this.ctx.fillText("Player1: " + this.scoreone, 30, 350);
+      this.ctx.fillText("Player2: " + this.scoretwo, 280, 60);
     }
   }
   
