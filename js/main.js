@@ -224,7 +224,8 @@
         return;
       }
 
-      
+      // clearrectで範囲四角内のcanvasをリセットする。
+      // update前に毎回画面を消すイメージ
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ball.draw();
       this.paddle.draw();
