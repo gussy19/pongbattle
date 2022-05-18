@@ -162,8 +162,6 @@
           this.mouseX = e.clientX;
         });
       }
-
-
     }
 
     // ボールの位置情報のアップデート。引数はballクラス
@@ -196,32 +194,36 @@
         this.game.addScore();
       }
       
-      // キャンバスの相対的な位置をrectに追加。
-      const rect = this.canvas.getBoundingClientRect();
-      // x座標を指定。マウス位置から長方形の左分を除いて、横幅の半分を除いたもの。
-      this.x = this.mouseX - rect.left - (this.w / 2);
 
-      // 壁の中でpaddleが動くようにする設定
-      if (this.x < 0) {
-        this.x = 0;
-      }
-      if (this.x + this.w > this.canvas.width) {
-        this.x = this.canvas.width - this.w;
-      }
 
 
       //プレイヤー1でない場合は、x軸はfirebaseから送信される値で決まる。
       if (username != "player1"){
         get(firstPlayerRef).then((snapshot) => {
           if (snapshot.val()) {
-              console.log(snapshot.val());
+              // console.log(snapshot.val());
               this.mouseX = snapshot.val();
+              this.mouseX += rect.left
+              this.mouseX += this.w / 2
           } else {
               console.log("No bot message available");
           }
           }).catch((error) => {
           console.error(error);
         });
+      }
+
+      // キャンバスの相対的な位置をrectに追加。
+      const rect = this.canvas.getBoundingClientRect();
+      // x座標を指定。マウス位置から長方形の左分を除いて、横幅の半分を除いたもの。
+
+      this.x = this.mouseX - rect.left - (this.w / 2);
+      // 壁の中でpaddleが動くようにする設定
+      if (this.x < 0) {
+        this.x = 0;
+      }
+      if (this.x + this.w > this.canvas.width) {
+        this.x = this.canvas.width - this.w;
       }
 
       // Firebaseへのデータsetのテスト
@@ -318,6 +320,8 @@
           if (snapshot.val()) {
               console.log(snapshot.val());
               this.mouseX = snapshot.val();
+              this.mouseX += rect.left
+              this.mouseX += this.w / 2
           } else {
               console.log("No bot message available");
           }
