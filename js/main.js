@@ -105,7 +105,8 @@
       // 壁の設定
       // キャンバスより下に行ったら、ミスのフラグを立てる
       if (this.y - this.r > this.canvas.height) {
-        this.isMissed = true;
+        // this.isMissed = true;
+        this.vy *= -1;
       }
 
       // 左か右に行ってしまった場合は、ベクトルxに-1をかけて跳ね返す
@@ -120,8 +121,8 @@
       if (
         this.y - this.r < 0
       ) {
-        // this.vy *= -1;
-        this.isMissed = true;
+        this.vy *= -1;
+        // this.isMissed = true;
       }
     }
 
@@ -161,18 +162,8 @@
           this.mouseX = e.clientX;
         });
       }
-      else {
-        get(firstPlayerRef).then((snapshot) => {
-          if (snapshot.val()) {
-              console.log(snapshot.val());
-              this.mouseX = snapshot.val();
-          } else {
-              console.log("No bot message available");
-          }
-          }).catch((error) => {
-          console.error(error);
-      });
-      }
+
+
     }
 
     // ボールの位置情報のアップデート。引数はballクラス
@@ -218,8 +209,25 @@
         this.x = this.canvas.width - this.w;
       }
 
-        // Firebaseへのデータsetのテスト
+
+      //プレイヤー1でない場合は、x軸はfirebaseから送信される値で決まる。
+      if (username != "player1"){
+        get(firstPlayerRef).then((snapshot) => {
+          if (snapshot.val()) {
+              console.log(snapshot.val());
+              this.mouseX = snapshot.val();
+          } else {
+              console.log("No bot message available");
+          }
+          }).catch((error) => {
+          console.error(error);
+        });
+      }
+
+      // Firebaseへのデータsetのテスト
+      if (username == "player1"){
         set(firstPlayerRef, this.x);
+      }
     }
 
     // paddleをcanvas内に描画
@@ -251,9 +259,11 @@
 
     // マウスの動きをmousemoveで取得。clientXでx軸を取得して追加
     addHandler() {
-      document.addEventListener('mousemove', e => {
-        this.mouseX = e.clientX;
-      });
+      if (username == "player2"){
+        document.addEventListener('mousemove', e => {
+          this.mouseX = e.clientX;
+        });
+      }
     }
 
     // ボールの位置情報のアップデート。引数はballクラス
@@ -293,6 +303,7 @@
       // x座標を指定。マウス位置から長方形の左分を除いて、横幅の半分を除いたもの。
       this.x = this.mouseX - rect.left - (this.w / 2);
 
+
       // 壁の中でpaddleが動くようにする設定
       if (this.x < 0) {
         this.x = 0;
@@ -301,8 +312,24 @@
         this.x = this.canvas.width - this.w;
       }
 
-        // Firebaseへのデータsetのテスト
+      //プレイヤー2でない場合は、x軸はfirebaseから送信される値で決まる。
+      if (username != "player2"){
+        get(secondPlayerRef).then((snapshot) => {
+          if (snapshot.val()) {
+              console.log(snapshot.val());
+              this.mouseX = snapshot.val();
+          } else {
+              console.log("No bot message available");
+          }
+          }).catch((error) => {
+          console.error(error);
+        });
+      }
+
+      // Firebaseへのデータsetのテスト
+      if (username == "player2"){
         set(secondPlayerRef, this.x);
+      }
     }
 
     // paddleをcanvas内に描画
