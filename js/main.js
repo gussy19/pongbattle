@@ -33,8 +33,13 @@
     }
 
     // ボールがpaddleにあたるときに、上部で跳ね返るように設定
-    reposition(paddleTop) {
+    repositionTop(paddleTop) {
       this.y = paddleTop - this.r;
+    }
+
+    // ボールがpaddleにあたるときに、下部で跳ね返るように設定
+    repositionBottom(paddleBottom) {
+      this.y = paddleBottom + this.r;
     }
 
     // ボールのx座標取得
@@ -73,7 +78,8 @@
       if (
         this.y - this.r < 0
       ) {
-        this.vy *= -1;
+        // this.vy *= -1;
+        this.isMissed = true;
       }
     }
 
@@ -86,8 +92,8 @@
     }
   }
 
-  // Paddleクラス
-  class Paddle {
+  // Paddle1 クラス(プレイヤー1)
+  class Paddle1 {
     constructor(canvas, game) {
       this.canvas = canvas;
       this.game = game;
@@ -139,7 +145,87 @@
       ) {
         // 上記のパドルの条件が揃えば、ボールの跳躍とボールの方向を指定。ゲームのスコアも追加。
         ball.bounce();
-        ball.reposition(paddleTop);
+        ball.repositionTop(paddleTop);
+        this.game.addScore();
+      }
+      
+      // キャンバスの相対的な位置をrectに追加。
+      const rect = this.canvas.getBoundingClientRect();
+      // x座標を指定。マウス位置から長方形の左分を除いて、横幅の半分を除いたもの。
+      this.x = this.mouseX - rect.left - (this.w / 2);
+
+      // 壁の中でpaddleが動くようにする設定
+      if (this.x < 0) {
+        this.x = 0;
+      }
+      if (this.x + this.w > this.canvas.width) {
+        this.x = this.canvas.width - this.w;
+      }
+    }
+
+    // paddleをcanvas内に描画
+    draw() {
+      this.ctx.fillStyle = '#fdfdfd';
+      this.ctx.fillRect(this.x, this.y, this.w, this.h);
+    }
+  }
+
+  // Paddle2 クラス(プレイヤー2)
+  class Paddle2 {
+    constructor(canvas, game) {
+      this.canvas = canvas;
+      this.game = game;
+      this.ctx = this.canvas.getContext('2d');
+      // パドルの横幅
+      this.w = 60;
+      // パドルの縦幅
+      this.h = 16;
+      // パドルのx座標
+      this.x = this.canvas.width / 2 - (this.w / 2);
+      // パドルのy座標
+      this.y = this.canvas.height - 380;
+      // マウスのx座標設定
+      this.mouseX = this.x;
+      // マウスの動きを反映
+      this.addHandler();
+    }
+
+    // マウスの動きをmousemoveで取得。clientXでx軸を取得して追加
+    addHandler() {
+      document.addEventListener('mousemove', e => {
+        this.mouseX = e.clientX;
+      });
+    }
+
+    // ボールの位置情報のアップデート。引数はballクラス
+    update(ball) {
+      // y座標と半径でballの底判定
+      const ballBottom = ball.getY() + ball.getR();
+      // paddleの上はpaddleのy座標
+      const paddleTop = this.y;
+      // y座標と半径でballの上判定
+      const ballTop = ball.getY() - ball.getR();
+      // paddleの底は、y座標にpaddleの高さを足したもの
+      const paddleBottom = this.y + this.h;
+      // ボールの中心はボールのx座標
+      const ballCenter = ball.getX();
+      // パドルの左はpaddleのx座標
+      const paddleLeft = this.x;
+      // paddleの右はpaddleのx座標にwidthを足したもの
+      const paddleRight = this.x + this.w;
+      
+      // ボールの跳ね返りイベントの設定
+      if (
+        //1行目のみ変更
+        ballTop > paddleTop &&
+        ballTop < paddleBottom &&
+        ballCenter > paddleLeft &&
+        ballCenter < paddleRight
+      ) {
+        // 上記のパドルの条件が揃えば、ボールの跳躍とボールの方向を指定。ゲームのスコアも追加。
+        ball.bounce();
+        // paddleBottomにreposition
+        ball.repositionBottom(paddleBottom);
         this.game.addScore();
       }
       
@@ -173,7 +259,8 @@
       // ボールクラスの読み込み
       this.ball = new Ball(this.canvas);
       // Paddleクラスの読み込み キャンバスとゲームクラスが引数
-      this.paddle = new Paddle(this.canvas, this);
+      this.paddle1 = new Paddle1(this.canvas, this);
+      this.paddle2 = new Paddle2(this.canvas, this);
       // ゲームループの実行
       this.loop();
       // ゲームオーバーフラグの初期値をfalseに設定
@@ -208,7 +295,8 @@
       // ボールクラスのアップデートの実行
       this.ball.update();
       // paddleクラスのアップデートを実行。引数にballを取る
-      this.paddle.update(this.ball);
+      this.paddle1.update(this.ball);
+      this.paddle2.update(this.ball);
 
       // ボールクラスのgetmissedstatus関数にヒットしたらGameOver
       if (this.ball.getMissedStatus()) {
@@ -228,7 +316,8 @@
       // update前に毎回画面を消すイメージ
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ball.draw();
-      this.paddle.draw();
+      this.paddle1.draw();
+      this.paddle2.draw();
       this.drawScore();
     }
 
