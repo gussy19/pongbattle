@@ -1,5 +1,27 @@
 'use strict';
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.1/firebase-app.js";
+    import { getDatabase, ref, get, push, set, onChildAdded, remove, onChildRemoved } 
+    from "https://www.gstatic.com/firebasejs/9.8.1/firebase-database.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyA9GSrJJ414kGHQ4ASeF_4-8Rq-oDf7myU",
+      authDomain: "gsdemo-af3d2.firebaseapp.com",
+      projectId: "gsdemo-af3d2",
+      storageBucket: "gsdemo-af3d2.appspot.com",
+      messagingSenderId: "302898596657",
+      appId: "1:302898596657:web:f446619431f2322d34be10"
+    };
 
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, "pongapp");
+
+// 即時関数
 (() => {
   // ランダムを作成する関数を準備
   function rand(min, max) {
@@ -14,7 +36,7 @@
       // ボールのx座標をランダム生成
       this.x = rand(30, 250);
       // ボールのスタートy座標は固定
-      this.y = 30;
+      this.y = 200;
       this.r = 10;
       // (3~5 or -3~-5をランダム生成。左右の方向性はランダム)
       this.vx = rand(3, 5) * (Math.random() < 0.5 ? 1 : -1);
@@ -161,6 +183,9 @@
       if (this.x + this.w > this.canvas.width) {
         this.x = this.canvas.width - this.w;
       }
+
+        // Firebaseへのデータsetのテスト
+        set(dbRef, this.x);
     }
 
     // paddleをcanvas内に描画
